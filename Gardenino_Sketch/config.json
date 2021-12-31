@@ -1,0 +1,29 @@
+{
+  "DataLogOffset": {
+    "Hour": 0,
+    "Minute": 1,
+    "Seconds": 0
+  },
+  "SoilHumidityRange": {
+    "Min": 0,
+    "Max": 50
+  },
+  "AirHumidityRange": {
+    "Min": 30,
+    "Max": 60
+  },
+  "AirTemperatureRange": {
+    "Min": 20,
+    "Max": 30
+  },
+  "ActivationTime": {
+    "StartTime": {
+      "Hour": 17,
+      "Minute": 0
+    },
+    "EndTime": {
+      "Hour": 18,
+      "Minute": 0
+    }
+  }
+}
