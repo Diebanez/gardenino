@@ -8,6 +8,7 @@ class Configuration
 public:
   Configuration();
   bool Load();
+  void LoadDefaultConfiguration();
 
   TimeSpan GetDataLogOffset() const;
   Range<float> GetSoilHumidityRange() const;

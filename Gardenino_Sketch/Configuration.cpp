@@ -46,6 +46,14 @@ bool Configuration::Load()
   return true;
 }
 
+void Configuration::LoadDefaultConfiguration()
+{
+  DataLogOffset = TimeSpan(0, 0, 1, 0);
+  SoilHumidityRange = Range<float>(0, 50);
+  AirHumidityRange = Range<float>(0, 50);
+  AirTemperatureRange = Range<float>(20, 30);
+  ActivationTime = Range<DateTime>(DateTime(2000, 1, 1, 17, 0, 0), DateTime(2000, 1, 1, 19, 0, 0));
+}
 TimeSpan Configuration::GetDataLogOffset() const
 {
   return DataLogOffset;

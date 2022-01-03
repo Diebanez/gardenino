@@ -1,14 +1,16 @@
-#define ENABLE_CONFIGURATION
+#define ENABLE_SD_STORING
+#define ENABLE_SENSOR_LOGGING
 #define ENABLE_DEBUG_LOG
+
+#define SD_CHIP_SELECT 53
+#define SWAP_PAGE_PIN 2
 
 #include "Debug.h"
 #include "Clock.h"
 #include "LCDManager.h"
 #include "ClockLCDPage.h"
 #include <SD.h>
-#ifdef ENABLE_CONFIGURATION
 #include "Configuration.h"
-#endif
 #include "SensorLogger.h"
 #include "Collection.h"
 #include "Sensor.h"
@@ -20,15 +22,12 @@
 #include "SensorMediumInRangeCondition.h"
 #include "TimeCondition.h"
 
-#define SD_CHIP_SELECT 53
-#define SWAP_PAGE_PIN 2
-
 Clock GlobalClock;
 LCDManager DisplayManger(0x27, 16, 2, new ClockLCDPage(&GlobalClock));
-#ifdef ENABLE_CONFIGURATION
 Configuration Config;
-#endif
+#if defined(ENABLE_SD_STORING) && defined(ENABLE_SENSOR_LOGGING)
 SensorLogger DataLogger(&GlobalClock);
+#endif
 Collection<Sensor> SoilHumiditySensors;
 DHT DhtSensor(5, DHT22);
 DHTSensor AirHumiditySensor(&DhtSensor, "Air humidity", 0);
@@ -64,8 +63,9 @@ void setup()
   }
   SERIAL_LOG(F("SD Initialized"))
 
-#ifdef ENABLE_CONFIGURATION
   SERIAL_LOG(F("Loading configuration ..."))
+
+#ifdef ENABLE_SD_STORING
   if (!Config.Load())
   {
     SERIAL_LOG(F("Error while loading configuration"))
@@ -74,14 +74,15 @@ void setup()
       delay(100);
     }
   }
+#else
+  Config.LoadDefaultConfiguration();
+#endif
   SERIAL_LOG(F("Loaded configuration"))
   SERIAL_LOG("Data log offset" + String(Config.GetDataLogOffset().hours()) + ":" + String(Config.GetDataLogOffset().minutes()) + ":" + String(Config.GetDataLogOffset().seconds()))
   SERIAL_LOG("Activation soil humidity range [" + String(Config.GetSoilHumidityRange().Start) + "-" + String(Config.GetSoilHumidityRange().End) + "]")
   SERIAL_LOG("Activation air humidity range [" + String(Config.GetAirHumidityRange().Start) + "-" + String(Config.GetAirHumidityRange().End) + "]")
   SERIAL_LOG("Activation air temperature range [" + String(Config.GetAirTemperatureRange().Start) + "-" + String(Config.GetAirTemperatureRange().End) + "]")
   SERIAL_LOG("Activation time [" + String(Config.GetActivationTime().Start.hour()) + ":" + String(Config.GetActivationTime().Start.minute()) + "-" + String(Config.GetActivationTime().End.hour()) + ":" + String(Config.GetActivationTime().End.minute()) + "]")
-
-#endif
 
   SERIAL_LOG(F("Initializing sensors ..."))
   SoilHumiditySensors.AddElement(new AnalogSensor("Soil Sensor 1", 0));
@@ -95,37 +96,39 @@ void setup()
     Sensor *configuringSensor = SoilHumiditySensors.GetElement(i);
     configuringSensor->Update();
     DisplayManger.AddPage(new SensorValueLCDPage(configuringSensor));
+#if defined(ENABLE_SD_STORING) && defined(ENABLE_SENSOR_LOGGING)
     DataLogger.AddSensorToLog(configuringSensor);
+#endif
   }
 
   DhtSensor.begin();
 
   AirHumiditySensor.Update();
   DisplayManger.AddPage(new SensorValueLCDPage(&AirHumiditySensor));
+#if defined(ENABLE_SD_STORING) && defined(ENABLE_SENSOR_LOGGING)
   DataLogger.AddSensorToLog(&AirHumiditySensor);
+#endif
 
   AirTemperatureSensor.Update();
   DisplayManger.AddPage(new SensorValueLCDPage(&AirTemperatureSensor));
+#if defined(ENABLE_SD_STORING) && defined(ENABLE_SENSOR_LOGGING)
   DataLogger.AddSensorToLog(&AirTemperatureSensor);
+#endif
 
   SERIAL_LOG(F("Sensors initialized"))
 
   SERIAL_LOG(F("Initializing sensors logger ..."))
-#ifdef ENABLE_CONFIGURATION
+#if defined(ENABLE_SD_STORING) && defined(ENABLE_SENSOR_LOGGING)
   DataLogger.Init(Config.GetDataLogOffset());
-#else
-  DataLogger.Init(TimeSpan(0, 1, 0, 0));
 #endif
   SERIAL_LOG(F("Sensors logger initialized"))
 
   SERIAL_LOG(F("Initializing pump actuator ..."))
   PumpActuator.Init();
-#ifdef ENABLE_CONFIGURATION
   PumpActuator.AddCondition(new SensorValueInRangeCondition(&AirHumiditySensor, Config.GetAirHumidityRange()));
   PumpActuator.AddCondition(new SensorValueInRangeCondition(&AirTemperatureSensor, Config.GetAirTemperatureRange()));
   PumpActuator.AddCondition(new TimeCondition(&GlobalClock, Config.GetActivationTime()));
   PumpActuator.AddCondition(new SensorMediumInRangeCondition(&SoilHumiditySensors, Config.GetSoilHumidityRange()));
-#endif
 
   SERIAL_LOG(F("Pump actuator initialized"))
   pinMode(SWAP_PAGE_PIN, INPUT_PULLUP);
@@ -151,7 +154,9 @@ void loop()
   PumpActuator.Update();
 
   DisplayManger.Update();
+#if defined(ENABLE_SD_STORING) && defined(ENABLE_SENSOR_LOGGING)
   DataLogger.Update();
+#endif
 
   delay(100);
 }

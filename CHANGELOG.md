@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added pragma to enable or disable sd storing
+- Added pragma to enable or disable sensor logging
+
+### Changed
+
+- Added default configuration handling
+
 ## [1.0.0] - 2021-12-31
 
 ### Added
