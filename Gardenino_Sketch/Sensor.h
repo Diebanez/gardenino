@@ -5,17 +5,17 @@
 class Sensor
 {
 public:
-    String GetName() const;
-    bool HasChanged() const;
+	String GetName() const;
+	bool HasChanged() const;
 
-    virtual float GetValue() = 0;
-    virtual void Update() = 0;
+	virtual float GetValue() = 0;
+	virtual void Update() = 0;
 
 protected:
-    Sensor(const String &name);
+	Sensor(const String& name);
 
-    bool bHasChanged;
+	bool bHasChanged;
 
 private:
-    String Name;
+	String Name;
 };

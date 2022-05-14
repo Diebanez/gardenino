@@ -1,16 +1,17 @@
 #pragma once
 
-#include <Wire.h>
 #include <RTClib.h>
+#include <Wire.h>
+
 
 class Clock
 {
 public:
-    bool Init();
-    String GetDate();
-    String GetTime();
-    DateTime GetNow();
+	bool Init();
+	String GetDate();
+	String GetTime();
+	DateTime GetNow();
 
 private:
-    RTC_DS3231 ClockModule;
+	RTC_DS3231 ClockModule;
 };

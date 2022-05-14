@@ -2,15 +2,14 @@
 
 String Sensor::GetName() const
 {
-    return Name;
+	return Name;
 }
 bool Sensor::HasChanged() const
 {
-    return bHasChanged;
+	return bHasChanged;
 }
 
-Sensor::Sensor(const String &name)
-    : Name(name), bHasChanged(false)
+Sensor::Sensor(const String& name) : Name(name), bHasChanged(false)
 {
-    Name = name;
+	Name = name;
 }

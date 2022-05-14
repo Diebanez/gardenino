@@ -3,5 +3,5 @@
 class Condition
 {
 public:
-    virtual bool Evaluate() = 0;
+	virtual bool Evaluate() = 0;
 };

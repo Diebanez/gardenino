@@ -9,11 +9,11 @@
     "Max": 50
   },
   "AirHumidityRange": {
-    "Min": 30,
+    "Min": 0,
     "Max": 60
   },
   "AirTemperatureRange": {
-    "Min": 20,
+    "Min": 15,
     "Max": 30
   },
   "ActivationTime": {
@@ -25,5 +25,7 @@
       "Hour": 18,
       "Minute": 0
     }
-  }
+  },
+  "MinOffsetTime": 60,
+  "MaxActivationTime": 30
 }
